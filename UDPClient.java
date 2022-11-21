@@ -2,8 +2,7 @@ import java.io.*;
 import java.net.*;
 
 class UDPClient {
-    public static void main(String args[]) throws Exception
-    {
+    public static void main(String args[]) throws Exception {
         BufferedReader inFromUser =
                 new BufferedReader(new InputStreamReader(System.in));
         DatagramSocket clientSocket = new DatagramSocket();
@@ -13,28 +12,44 @@ class UDPClient {
         byte[] sendData = new byte[1024];
         byte[] receiveData = new byte[1024];
 
-        String sentence = inFromUser.readLine();
-        sendData = sentence.getBytes();
+        boolean flag = true;
 
-        DatagramPacket sendPacket =
-                new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
+        while (flag) {
+                System.out.print("Please enter your calculation: ");
+                String expression = inFromUser.readLine();
+                sendData = expression.getBytes();
 
-        clientSocket.send(sendPacket);
+                DatagramPacket sendPacket =
+                        new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
 
-        DatagramPacket receivePacket =
-                new DatagramPacket(receiveData, receiveData.length);
+                clientSocket.send(sendPacket);
 
-        clientSocket.receive(receivePacket);
+        // GOES TO SERVER NOW
+        
+        // --------------------------------------------------------------
 
-        String modifiedSentence =
-                new String(receivePacket.getData());
+        // COMES BACK TO CLIENT HERE
 
-        System.out.println("FROM SERVER:" + modifiedSentence);
+                DatagramPacket receivePacket =
+                        new DatagramPacket(receiveData, receiveData.length);
 
-        clientSocket.receive(receivePacket);
-        String IP = new String(receivePacket.getData());
-        System.out.println(IP);
+                clientSocket.receive(receivePacket);
 
-        clientSocket.close();
+                String result = new String(receivePacket.getData());
+
+                System.out.println("FROM SERVER: Result is " + result);
+
+        // clientSocket.receive(receivePacket);
+        // String IP = new String(receivePacket.getData());
+        // System.out.println("The IP is: " + IP);
+
+                System.out.print("Would you like to enter more calculations? Enter 'y' to continue: ");
+                String response = inFromUser.readLine();
+                if (!response.equals("y")) {
+                        flag = false;
+                        clientSocket.close();
+                }
+
+        }
     }
 }
