@@ -18,10 +18,10 @@ class UDPClient {
                 System.out.print("Please enter your calculation: ");
                 String expression = inFromUser.readLine();
                 sendData = expression.getBytes();
-
+                // create datagram with data-to-send, length, IP address, port
                 DatagramPacket sendPacket =
                         new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
-
+                // send datagram to server
                 clientSocket.send(sendPacket);
 
         // GOES TO SERVER NOW
@@ -32,7 +32,7 @@ class UDPClient {
 
                 DatagramPacket receivePacket =
                         new DatagramPacket(receiveData, receiveData.length);
-
+                //read datagram from server
                 clientSocket.receive(receivePacket);
 
                 String result = new String(receivePacket.getData());

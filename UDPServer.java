@@ -11,11 +11,14 @@ class UDPServer {
         byte[] sendData  = new byte[1024];
 
         while(true) {
-
+            // create space for received datagram
             DatagramPacket receivePacket =
                     new DatagramPacket(receiveData, receiveData.length);
-            serverSocket.receive(receivePacket);
 
+            //receive datagram
+            serverSocket.receive(receivePacket);
+            
+            // get IP address, port # of sender
             String expression = new String(receivePacket.getData());
 
             InetAddress IPAddress = receivePacket.getAddress();
@@ -27,6 +30,7 @@ class UDPServer {
 
             sendData = result.getBytes();
 
+            // create datagram to send to client
             DatagramPacket sendPacket =
                     new DatagramPacket(sendData, sendData.length, IPAddress,
                             port);
@@ -35,9 +39,10 @@ class UDPServer {
             //         new DatagramPacket(IPAddress.getHostName().getBytes(), IPAddress.getHostName().getBytes().length, IPAddress,
             //                 port);
 
+            //write out datagram to socket
             serverSocket.send(sendPacket);
             //serverSocket.send(sendPacket2);
-        }
+        } // end of loop, loop back and wait for another datagram
     }
 
     public static int evaluate(String expression){
