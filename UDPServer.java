@@ -1,14 +1,21 @@
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.*;
 
 class UDPServer {
+    public static HashMap<String, String> userLog = new HashMap<>();
     public static void main(String args[]) throws Exception {
+        
 
         DatagramSocket serverSocket = new DatagramSocket(9876);
 
         byte[] receiveData = new byte[1024];
         byte[] sendData  = new byte[1024];
+
+        int userNum = 1;
 
         while(true) {
             // create space for received datagram
@@ -42,6 +49,8 @@ class UDPServer {
             //write out datagram to socket
             serverSocket.send(sendPacket);
             //serverSocket.send(sendPacket2);
+            log(userNum);
+            userNum++;
         } // end of loop, loop back and wait for another datagram
     }
 
@@ -152,4 +161,9 @@ class UDPServer {
         return 0;
     }
 
+    public static void log(int userNumber) { 
+        Logger logger = Logger.getLogger(UDPServer.class.getName());
+        logger.info("User " + userNumber + "attached to the server");
+    }
 }
+
