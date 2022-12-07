@@ -12,10 +12,15 @@ class UDPClient {
         byte[] sendData = new byte[1024];
         byte[] receiveData = new byte[1024];
 
+        // used for exiting loop when client wants to disconnect
         boolean flag = true;
 
+
+        // get name from client upon connecting
         System.out.print("Please enter your name: ");
                 String name = inFromUser.readLine();
+
+                // Prepend N: to denote that this packet contains a name, not a calculation
                 String sendName = "N:" + name;
                 sendData = sendName.getBytes();
                 // create datagram with data-to-send, length, IP address, port
@@ -51,14 +56,13 @@ class UDPClient {
 
                 System.out.println("FROM SERVER: Result is " + result);
 
-        // clientSocket.receive(receivePacket);
-        // String IP = new String(receivePacket.getData());
-        // System.out.println("The IP is: " + IP);
-
+                // Ask user if they want to keep entering calculations. Any input other than 'y' will terminate the program.
                 System.out.print("Would you like to enter more calculations? Enter 'y' to continue: ");
                 String response = inFromUser.readLine();
                 if (!response.equals("y")) {
                         flag = false;
+                        
+                        // Prepend C: to denote that this packet is a termination request
                         String closeRequest = "C:" + name;
                         sendData = closeRequest.getBytes();
                         sendPacket =

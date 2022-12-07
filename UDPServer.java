@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import java.util.logging.*;
 
 class UDPServer {
+    // used to keep track of all clients that have connected to server
     public static ArrayList<String> userLog = new ArrayList<>();
     public static void main(String args[]) throws Exception {
         
@@ -29,11 +30,14 @@ class UDPServer {
 
             String data = new String(receivePacket.getData());
 
+            // Check if the packet contains a name, if so, add client name to array and log when they connected
             if (data.startsWith("N:")) {
                 String name = data.substring(2);
                 logConnection(name);
                 userLog.add(name);
                 continue;
+
+                // Check if the packet contains a termination request, if so, log when the client terminated
             } else if (data.startsWith("C:")) {
                 int disconnectedUserIndex = userLog.indexOf(data.substring(2));
                 String disconnectedUser = userLog.get(disconnectedUserIndex);
@@ -42,14 +46,10 @@ class UDPServer {
             }
             
             // get IP address, port # of sender
-
             InetAddress IPAddress = receivePacket.getAddress();
-
             int port = receivePacket.getPort();
 
             String result = evaluate(data) + "";
-
-
             sendData = result.getBytes();
 
             // create datagram to send to client
@@ -57,18 +57,13 @@ class UDPServer {
                     new DatagramPacket(sendData, sendData.length, IPAddress,
                             port);
 
-            // DatagramPacket sendPacket2 =
-            //         new DatagramPacket(IPAddress.getHostName().getBytes(), IPAddress.getHostName().getBytes().length, IPAddress,
-            //                 port);
-
             //write out datagram to socket
             serverSocket.send(sendPacket);
-            //serverSocket.send(sendPacket2);
 
-            
         } // end of loop, loop back and wait for another datagram
     }
 
+    // main function for evaluating string mathematical expressions (infix)
     public static int evaluate(String expression){
         //Stack for operands
         Stack<Integer> operands = new Stack<>();
@@ -176,11 +171,13 @@ class UDPServer {
         return 0;
     }
 
+    // logging user info when connecting
     public static void logConnection(String name) { 
         Logger logger = Logger.getLogger(UDPServer.class.getName());
         logger.info(name + " attached to the server");
     }
 
+    // logging user info when terminating
     public static void logTerminate(String name) {
         Logger logger = Logger.getLogger(UDPServer.class.getName());
         logger.info(name + " disconnected from the server");
