@@ -1,12 +1,14 @@
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.*;
 
 class UDPServer {
-    public static HashMap<String, String> userLog = new HashMap<>();
+    public static ArrayList<String> userLog = new ArrayList<>();
     public static void main(String args[]) throws Exception {
         
 
@@ -15,7 +17,7 @@ class UDPServer {
         byte[] receiveData = new byte[1024];
         byte[] sendData  = new byte[1024];
 
-        int userNum = 1;
+        
 
         while(true) {
             // create space for received datagram
@@ -24,15 +26,28 @@ class UDPServer {
 
             //receive datagram
             serverSocket.receive(receivePacket);
+
+            String data = new String(receivePacket.getData());
+
+            if (data.startsWith("N:")) {
+                String name = data.substring(2);
+                logConnection(name);
+                userLog.add(name);
+                continue;
+            } else if (data.startsWith("C:")) {
+                int disconnectedUserIndex = userLog.indexOf(data.substring(2));
+                String disconnectedUser = userLog.get(disconnectedUserIndex);
+                logTerminate(disconnectedUser);
+                continue;
+            }
             
             // get IP address, port # of sender
-            String expression = new String(receivePacket.getData());
 
             InetAddress IPAddress = receivePacket.getAddress();
 
             int port = receivePacket.getPort();
 
-            String result = evaluate(expression) + "";
+            String result = evaluate(data) + "";
 
 
             sendData = result.getBytes();
@@ -49,8 +64,8 @@ class UDPServer {
             //write out datagram to socket
             serverSocket.send(sendPacket);
             //serverSocket.send(sendPacket2);
-            log(userNum);
-            userNum++;
+
+            
         } // end of loop, loop back and wait for another datagram
     }
 
@@ -161,9 +176,14 @@ class UDPServer {
         return 0;
     }
 
-    public static void log(int userNumber) { 
+    public static void logConnection(String name) { 
         Logger logger = Logger.getLogger(UDPServer.class.getName());
-        logger.info("User " + userNumber + "attached to the server");
+        logger.info(name + " attached to the server");
+    }
+
+    public static void logTerminate(String name) {
+        Logger logger = Logger.getLogger(UDPServer.class.getName());
+        logger.info(name + " disconnected from the server");
     }
 }
 

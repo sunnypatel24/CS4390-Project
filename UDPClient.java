@@ -14,12 +14,24 @@ class UDPClient {
 
         boolean flag = true;
 
+        System.out.print("Please enter your name: ");
+                String name = inFromUser.readLine();
+                String sendName = "N:" + name;
+                sendData = sendName.getBytes();
+                // create datagram with data-to-send, length, IP address, port
+                DatagramPacket sendPacket =
+                        new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
+                // send datagram to server
+                clientSocket.send(sendPacket);
+
+
+
         while (flag) {
                 System.out.print("Please enter your calculation: ");
                 String expression = inFromUser.readLine();
                 sendData = expression.getBytes();
                 // create datagram with data-to-send, length, IP address, port
-                DatagramPacket sendPacket =
+                sendPacket =
                         new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
                 // send datagram to server
                 clientSocket.send(sendPacket);
@@ -47,6 +59,12 @@ class UDPClient {
                 String response = inFromUser.readLine();
                 if (!response.equals("y")) {
                         flag = false;
+                        String closeRequest = "C:" + name;
+                        sendData = closeRequest.getBytes();
+                        sendPacket =
+                        new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
+                // send datagram to server
+                        clientSocket.send(sendPacket);
                         clientSocket.close();
                 }
 
